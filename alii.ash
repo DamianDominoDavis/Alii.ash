@@ -69,34 +69,34 @@ if (available_choices["coffee"].to_boolean()) {
 if(available_choices["ascend"].to_boolean()){
   print("Ascending into gyou!", "teal");
   wait(5);
+  /* **Former handling of ascending to gyou and picking astral items **
   visit_url("ascend.php?action=ascend&confirm=on&confirm2=on"); 
-
   visit_url("afterlife.php?action=pearlygates");
   visit_url("afterlife.php?action=buydeli&whichitem=5046" );
   visit_url("afterlife.php?action=buyarmory&whichitem=5039");
-
   print("Stepping into the Mortal Realm in 15 seconds without any perms! Press ESC to manually perm skills!", "teal");
   waitq(10); 
   wait(5);
-
   visit_url("afterlife.php?action=ascend&confirmascend=1&whichsign=8&gender=2&whichclass=4&whichpath=44&asctype=2&nopetok=1&noskillsok=1&pwd", true);
-  visit_url("choice.php");
+  */
+  cli_execute("c2t_ascend"); //c2t call to ascend. Change settings via the relay page.
+  visit_url("choice.php"); //think I still need to click thru the choice adv
   run_choice(1);
-  
 }
 
 if (available_choices["gyou"].to_boolean()) {
   print("Running gyou!", "teal");
-  //cli_execute("ptrack add gyouBegin");
+  cli_execute("ptrack add gyouBegin");
   cli_execute("loopgyou");
   if(my_adventures() > 40){
-    abort("We have more than 40 adventures remaining after the run! Please manually spend them down to 40 before breaking prism.");
+    cli_execute("PandAliisza 40");//call using 40 as arg. Should execute script but stop when ever advs remaining is == 40
+    //abort("We have more than 40 adventures remaining after the run! Please manually spend them down to 40 before breaking prism.");
   }
   print("Breaking the Prism in t-10 seconds", "teal");
   waitq(16);
   visit_url("place.php?whichplace=nstower&action=ns_11_prism");
   visit_url("main.php");
-  run_choice(1); // Club Seals! 
+  run_choice(1); //Change number to pick class. 1=SC; =TT; 3=PM; 4=SA; 5=DB; 6=AT
   visit_url("main.php");
 }
 
@@ -106,7 +106,7 @@ if (available_choices["lunch"].to_boolean()) {
   cli_execute("ptrack add lunchBegin");
   cli_execute("acquire carpe");  /*This is here becasue sometimes buffy be slow.*/
   cli_execute("levelup");
-  cli_execute("PandamoniumQuestAliiUpdate.ash");//testing updated quest logic
+  cli_execute("PandAliisza 5");//call using random low number of adventures remaining, but more than 0 for testing
   drink($item[Steel margarita]);
   use($item[Asdon Martin keyfob]);
 }
@@ -129,13 +129,15 @@ if (available_choices["smoke"].to_boolean()) {
   //janky handling of using shotglass to make use of the +5 turns from blender before swapping to Wombat.
   if(!get_property("_mimeArmyShotglassUsed").to_boolean()){
     print("We have not used shotglass yet.");
-    use($item[astral six-pack]);
+    if(item_amount($item[astral six-pack]) > 0){
+      use($item[astral six-pack]);
+    }
     drink(1, $item[astral pilsner]);
   }else{
     print("We already used our shotglass...somehow. Big sad!");
   }
   //tuning to wombat
-  if((!get_property('moonTuned').to_boolean()) && (my_sign() == "Blender") && (available_amount($item[Hewn moon-rune spoon]).to_boolean()) ){
+  if((!get_property('moonTuned').to_boolean()) && (my_sign() != "Wombat") && (available_amount($item[Hewn moon-rune spoon]).to_boolean()) ){
   foreach sl in $slots[acc1, acc2, acc3]{
     if(equipped_item(sl) == $item[Hewn moon-rune spoon]){
       equip(sl, $item[none]);
@@ -144,7 +146,7 @@ if (available_choices["smoke"].to_boolean()) {
     visit_url("inv_use.php?whichitem=10254&doit=96&whichsign=7");
   }
 
-  //monkey paw while garbo adds support
+  //monkey paw wishes cause garbo does silly things in post gyou leg
   visit_url("main.php?action=cmonk&pwd"); foreach str in $strings["Frosty", "Sinuses for Miles", "Braaaaaains", "Frosty", "Sinuses for Miles"] { run_choice(1, `wish=${str}`); } visit_url("main.php");
 
   cli_execute("garbo");
@@ -168,7 +170,9 @@ if (available_choices["smoke"].to_boolean()) {
   cli_execute("mallbuy 9999 surprisingly capacious handbag @ 120");
   cli_execute("mallbuy 9999 fireclutch @ 650");
   cli_execute("pTrack recap");
-  
+
+  put_closet(max(0, my_meat() - 10000000)); //Stash all but 10mil meat while saving up big numbers
+  //max function returns whichever is higher. So in the case of less than 10mil, 0 is returned and nothing is closeted
   if(item_amount($item[navel ring of navel gazing]) > 0){
     print("Returning ring to Noob.");
     kmail("Noobsauce", "Returning your ring.", 0, int[item] {$item[navel ring of navel gazing] : 1});
@@ -176,5 +180,6 @@ if (available_choices["smoke"].to_boolean()) {
 
 cli_execute("raffle 11");
 print("Done!", "teal");
+
 }
 }
