@@ -142,7 +142,9 @@ void Gyou(){
 
 void Cs(){
   print("Running CS!", "teal");
+  print("ptrack add csStart");
   cli_execute("lcswrapper");
+  cli_execute("make deep dish of legend");
 }
 
 void Lunch(){
