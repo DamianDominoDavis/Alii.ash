@@ -97,10 +97,11 @@ void Coffee(){
       print("Tofu is more expensive than would be vialble. Skipping Tofu.");
     }
   } /* FYI: Garbo usually doesn't use one of these, so free 5 adventures. Yay!*/
-  cli_execute("set garbo_yachtzeechain = false");//Safety setting of yachtzee to false. Yachtzee() will turn on/off as needed
+  set_property("garbo_yachtzeechain", "false");//Safety setting of yachtzee to false. Yachtzee() will turn on/off as needed
   Yachtzee();
   cli_execute("garbo ascend workshed=cmc");
   print("Garbo finished running. Safely setting Yachtzee off.","blue");
+  set_property("garbo_yachtzeechain", "false");
   cli_execute("shrug ur-kel");
   cli_execute("drink stillsuit distillate");
   cli_execute("CONSUME NIGHTCAP");
@@ -202,7 +203,7 @@ void Smoke(){
   Yachtzee();
   cli_execute("garbo");
   print("Garbo finished running. Safely setting Yachtzee off.","blue");
-  cli_execute("set garbo_yachtzeechain = false");//Safety setting of yachtzee to false. Yachtzee() will turn on/off as needed
+  set_property("garbo_yachtzeechain", "false");//Safety setting of yachtzee to false. Yachtzee() will turn on/off as needed
   cli_execute("shrug ur-kel");
   cli_execute("CONSUME NIGHTCAP");
   retrieve_item($item[Burning cape]);
@@ -242,19 +243,19 @@ void Smoke(){
 
 void HandleC2T(){
   if(to_boolean(available_choices("gyou"))){
-    cli_execute("set c2t_ascend = 2,27,2,44,8,5046,5039,2,0");
+    set_property("c2t_ascend", "2,27,2,44,8,5046,5039,2,0");
   }
   if(to_boolean(available_choices("cs"))){
-    cli_execute("set c2t_ascend = 2,3,2,25,2,5046,5040,2,0");
+    set_property("c2t_ascend", "2,3,2,25,2,5046,5040,2,0");
   }
 }
 
 void Yachtzee(){
   if(to_boolean(available_choices("gyou"))){
     print("Looping Grey You today, Will not be doing Yachtzee.", "teal");
-    cli_execute("set garbo_yachtzeechain = false");
+    set_property("garbo_yachtzeechain", "false");
   }else if(to_boolean(available_choices("cs"))){
-    cli_execute("set garbo_yachtzeechain = true");
+    set_property("garbo_yachtzeechain", "true");
     if(to_boolean(get_property("garbo_yachtzeechain")) && (item_amount($item[one-day ticket to Spring Break Beach]) > 0 || buy(1, $item[one-day ticket to Spring Break Beach], 375000) > 0)){
         use($item[one-day ticket to Spring Break Beach]);
     }
