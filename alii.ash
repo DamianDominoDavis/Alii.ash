@@ -90,22 +90,18 @@ void Coffee(){
   
   if(!get_property("_essentialTofuUsed").to_boolean()){ 
     print("Tofu unused! Trying to buy some!", "teal"); 
-    cli_execute(`buy essential tofu @{(get_property("valueOfAdventure").to_int() * 4)}`);
+    buy(1, $item[essential tofu], get_property(to_int("valueOfAdventure")) * 4);
     if (item_amount($item[essential tofu]) > 0) { 
       use(1, $item[Essential Tofu]); 
     } else{
       print("Tofu is more expensive than would be vialble. Skipping Tofu.");
     }
   } /* FYI: Garbo usually doesn't use one of these, so free 5 adventures. Yay!*/
-  set_property("garbo_yachtzeechain", "false");//Safety setting of yachtzee to false. Yachtzee() will turn on/off as needed
   Yachtzee();
-  cli_execute("garbo ascend workshed=cmc");
-  print("Garbo finished running. Safely setting Yachtzee off.","blue");
-  set_property("garbo_yachtzeechain", "false");
   cli_execute("shrug ur-kel");
   cli_execute("drink stillsuit distillate");
   cli_execute("CONSUME NIGHTCAP");
-  cli_execute("garbo ascend");
+  Yachtzee();
   print("Garbo finished running. Safely setting Yachtzee off.","blue");
 }
 
@@ -199,11 +195,7 @@ void Smoke(){
     print("Tofu is more expensive than would be vialble. Skipping Tofu.");
     }
   } //FYI: Garbo usually doesn't use one of these, so free 5 adventures. Yay!
-  cli_execute("set garbo_yachtzeechain = false");//Safety setting of yachtzee to false. Yachtzee() will turn on/off as needed
   Yachtzee();
-  cli_execute("garbo");
-  print("Garbo finished running. Safely setting Yachtzee off.","blue");
-  set_property("garbo_yachtzeechain", "false");//Safety setting of yachtzee to false. Yachtzee() will turn on/off as needed
   cli_execute("shrug ur-kel");
   cli_execute("CONSUME NIGHTCAP");
   retrieve_item($item[Burning cape]);
@@ -251,15 +243,24 @@ void HandleC2T(){
 }
 
 void Yachtzee(){
-  if(to_boolean(available_choices("gyou"))){
-    print("Looping Grey You today, Will not be doing Yachtzee.", "teal");
-    set_property("garbo_yachtzeechain", "false");
-  }else if(to_boolean(available_choices("cs"))){
-    set_property("garbo_yachtzeechain", "true");
-    if(to_boolean(get_property("garbo_yachtzeechain")) && (item_amount($item[one-day ticket to Spring Break Beach]) > 0 || buy(1, $item[one-day ticket to Spring Break Beach], 375000) > 0)){
-        use($item[one-day ticket to Spring Break Beach]);
+  if(my_inebriety() > inebriety_limit()){
+    print("We're overdrunk. Running Garbo overdrunk turns.", "blue");
+    cli_execute("garbo");
+  }
+
+  if(get_property(to_int("ascensionsToday") == 1)){
+    if(to_boolean(available_choices["gyou"])){
+      print("We have ascended today and it was a gyou run. We will not Yachtzeechain this leg.", "blue");
+      cli_execute("garbo");
+    }else{
+      print("We have ascended today, and it was a CS run. We will Yachtzeechain this leg.", "blue");
+      cli_execute("garbo yachtzeechain");
     }
-   }
+  }else{
+    print("We have not ascended today. Breakfast leg always does Yachtzee!", "blue");
+    cli_execute("garbo yachtzeechain ascend workshed=cmc");
+  }
+
 }
 
 }
