@@ -136,13 +136,13 @@ void Gyou(){
   waitq(16);
   visit_url("place.php?whichplace=nstower&action=ns_11_prism");
   visit_url("main.php");
-  run_choice(1); //Change number to pick class. 1=SC; =TT; 3=PM; 4=SA; 5=DB; 6=AT
+  run_choice(1); //Change number to pick class. 1=SC; 2=TT; 3=PM; 4=SA; 5=DB; 6=AT
   visit_url("main.php");
 }
 
 void Cs(){
   print("Running CS!", "teal");
-  print("ptrack add csStart");
+  print("ptrack add csBegin");
   cli_execute("lcswrapper");
   cli_execute("make deep dish of legend");
 }
@@ -236,10 +236,10 @@ void Smoke(){
 }
 
 void HandleC2T(){
-  if(to_boolean(available_choices("gyou"))){
+  if(to_boolean(available_choices["gyou"])){
     set_property("c2t_ascend", "2,27,2,44,8,5046,5039,2,0");
   }
-  if(to_boolean(available_choices("cs"))){
+  if(to_boolean(available_choices["cs"])){
     set_property("c2t_ascend", "2,3,2,25,2,5046,5040,2,0");
   }
 }
