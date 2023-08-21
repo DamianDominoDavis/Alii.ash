@@ -14,7 +14,7 @@ void main(string settings) {
 		# "all": "coffee ascend gyou cs lunch smoke",
 		"post": "lunch smoke",
 		"gloop":"coffee ascend gyou lunch smoke",
-		"cloop":"coffee ascend cs lunch smoke"
+		"cloop":"coffee ascend cs smoke"
 	};
 	// parse settings
 	foreach i,key in settings.split_string(" ") {
