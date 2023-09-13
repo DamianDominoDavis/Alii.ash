@@ -82,7 +82,7 @@ void yachtzee() {
 	if (get_property("_stenchAirportToday").to_boolean())
 		buy($coinmaster[The Dinsey Company Store], available_amount($item[Funfunds&trade;]) / 20, $item[One-day ticket to dinseylandfill]);
 	if (!get_property("_sleazeAirportToday").to_boolean())
-		buy($coinmaster[Buff Jimmy's Souvenir Shop], available_amount($item[Beach Buck]) / 100, $item[one-day ticket to Spring Break Beach]);
+		buy($coinmaster[Buff Jimmys Souvenir Shop], available_amount($item[Beach Buck]) / 100, $item[one-day ticket to Spring Break Beach]);
 }
 
 void coffee() {
