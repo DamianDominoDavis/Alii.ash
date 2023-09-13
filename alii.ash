@@ -7,15 +7,14 @@ void main(string settings) {
 	foreach task in $strings[
 		coffee,
 		ascend,
-//		gyou,
+#		gyou,
 		cs,
-		lunch,
+#		lunch,
 		smoke,
 		sleep
 	] available_choices[task] = false;
 	// abbreviations
 	string[string] abbreviations = {
-		"post": "lunch smoke",
 		"cloop":"coffee ascend cs lunch smoke"
 	};
 	// parse settings
@@ -51,10 +50,10 @@ void yachtzee() {
 		cli_execute("garbo");
 		return;
 	}
-//	else if (get_property("ascensionsToday").to_int() > 0 && available_choices["gyou"]) {
-//			print("We have ascended today and it was a gyou run. We will not Yachtzeechain this leg.", "blue");
-//			cli_execute("garbo");
-//	}
+#	else if (get_property("ascensionsToday").to_int() > 0 && available_choices["gyou"]) {
+#			print("We have ascended today and it was a gyou run. We will not Yachtzeechain this leg.", "blue");
+#			cli_execute("garbo");
+#	}
 	else if (get_property("ascensionsToday").to_int() > 0 && available_choices["cs"]) {
 		print("We have ascended today, and it was a CS run. We will Yachtzeechain this leg.", "blue");
 		unlockSleazeAirport();
@@ -66,38 +65,42 @@ void yachtzee() {
 		cli_execute("garbo yachtzeechain ascend workshed=cmc");
 	}
 
-	foreach it in $items[Bag o\' Tricks, Crown of Thrones, Dallas Dynasty Falcon Crest shield, Pantsgiving, Spooky Putty sheet, Talisman of Baio, defective Game Grid token, haiku katana, mafia pointer finger ring]
-		if (it.available_amount() > 0 && get_clan_name().contains_text('Syndicate'))
-			cli_execute(`try; stash put 1 {it}`);
+	// stash
+	cli_execute("/whitelist The Consortium of the Syndicate of the Kingdom");
+	waitq(2);
+	foreach it in $items[Bag o Tricks, Crown of Thrones, defective Game Grid token, Pantsgiving, Platinum Yendorian Express Card, Spooky Putty sheet, Talisman of Baio, defective Game Grid token, haiku katana, mafia pointer finger ring]
+		if (it.available_amount() > 0 && get_clan_name() == 'The Consortium of the Syndicate of the Kingdom') && it.stash_amount() < 1)
+			cli_execute("try; stash put 1 " + it );
+	// shop
 	cli_execute("shop put -3 park garb @ 210;");
+	// spend
 	cli_execute("use * gathered meat;");
-	cli_execute("autosell * meat stack;");
-	cli_execute("autosell * cheap sunglasses;");
-	cli_execute("autosell * expensive camera;");
-	cli_execute("autosell * knob visor;");
-	cli_execute("autosell * embezzler oil;");
+	// sell
+	foreach it in $items[meat stack, dense meat stack, cheap sunglasses, expensive camera, fat stack of cash, knob visor, embezzler oil]
+		cli_execute(`autosell * {it}`);
+	// supply
 	if (get_property("_stenchAirportToday").to_boolean())
 		buy($coinmaster[The Dinsey Company Store], available_amount($item[Funfunds&trade;]) / 20, $item[One-day ticket to dinseylandfill]);
 	if (!get_property("_sleazeAirportToday").to_boolean())
 		buy($coinmaster[Buff Jimmy's Souvenir Shop], available_amount($item[Beach Buck]) / 100, $item[one-day ticket to Spring Break Beach]);
-
 }
 
 void coffee() {
+	int voa = get_property("valueOfAdventure").to_int();
 	print("Aftercore day, start to finish", "teal");
 	cli_execute("ptrack add coffeeBegin");
 	cli_execute("/whitelist cgc");
 	cli_execute("secondbreakfast");
 	if (!get_property("_essentialTofuUsed").to_boolean()) {
 		print("Tofu unused! Trying to buy some!", "teal");
-		buy(1, $item[essential tofu], get_property("valueOfAdventure").to_int() * 4);
+		buy(1, $item[essential tofu], voa * 4);
 		if (available_amount($item[essential tofu]) > 0)
 			use(1, $item[Essential Tofu]);
 	}
 	yachtzee();
 	cli_execute("shrug ur-kel");
 	cli_execute("drink stillsuit distillate");
-	cli_execute(`consume all nomeat nightcap value {get_property('valueOfAdventure')} valuepvp {get_property('valueOfAdventure')};`.to_upper_case());
+	cli_execute(`consume all nomeat nightcap value {voa} valuepvp {voa};`.to_upper_case());
 	yachtzee();
 }
 
@@ -106,11 +109,6 @@ void ascend() {
 		abort("You have not nightcapped yet! Overdrink and burn turns, then run again!");
 	if (my_adventures() > 0)
 		abort("You have nightcapped, but have turns remaining! Burn turns, then run again!");
-//	print("Jumping through the Gash!", "teal");
-//	if (available_choices["gyou"])
-//		set_property("c2t_ascend", "2,27,2,44,8,5046,5039,2,0");
-//	else if (available_choices["cs"])
-//		set_property("c2t_ascend", "2,3,2,25,2,5046,5040,2,0");
 	wait(5);
 	cli_execute("c2t_ascend"); //c2t call to ascend. Change settings via the relay page.
 	visit_url("choice.php"); //think I still need to click thru the choice adv
@@ -154,16 +152,6 @@ void lunch() {
 			use($item[astral six-pack]);
 		drink(1, $item[astral pilsner]);
 	}
-//	if ((!get_property('moonTuned').to_boolean()) && my_sign() != "Wombat" && available_amount($item[Hewn moon-rune spoon]) > 0)
-//		foreach s in $slots[acc1,acc2,acc3]
-//			if (s.equipped_item() == $item[Hewn moon-rune spoon])
-//				s.equip($item[none]);
-//	visit_url("inv_use.php?whichitem=10254&doit=96&whichsign=7");
-//	//monkey paw wishes cause garbo does silly things in post gyou leg
-//	visit_url("main.php?action=cmonk&pwd");
-//	foreach str in $strings["Frosty", "Sinuses for Miles", "Braaaaaains", "Frosty", "Sinuses for Miles"]
-//		run_choice(1, `wish=${str}`);
-//	visit_url("main.php");
 }
 
 void smoke() {
@@ -174,9 +162,10 @@ void smoke() {
 }
 
 void sleep() {
+	int voa = get_property("valueOfAdventure").to_int();
 	retrieve_item($item[Burning cape]);
 	if (available_amount($item[clockwork maid]) < 1)
-		cli_execute(`try; buy clockwork maid @{(get_property("valueOfAdventure").to_int() * 8)}`);
+		cli_execute(`try; buy clockwork maid @{voa * 8}`);
 	cli_execute("try; use Clockwork Maid;");
 	cli_execute('/wl cool guy crew');
 	cli_execute("familiar left;");
@@ -190,7 +179,7 @@ void sleep() {
 	cli_execute("shrug polka of plenty;");
 	cli_execute("cast 2 ode to booze;");
 	cli_execute("drink stillsuit distillate;");
-	cli_execute("consume all nomeat nightcap value 7000 valuepvp 7000;".to_upper_case());
+	cli_execute(`consume all nomeat nightcap value {voa} valuepvp {voa};`.to_upper_case());
 	yachtzee();
 	cli_execute("familiar left;");
 	cli_execute("unequip familiar;");
