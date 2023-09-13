@@ -7,9 +7,9 @@ void main(string settings) {
 	foreach task in $strings[
 		coffee,
 		ascend,
-#		gyou,
+//		gyou,
 		cs,
-#		lunch,
+//		lunch,
 		smoke,
 		sleep
 	] available_choices[task] = false;
@@ -50,10 +50,10 @@ void yachtzee() {
 		cli_execute("garbo");
 		return;
 	}
-#	else if (get_property("ascensionsToday").to_int() > 0 && available_choices["gyou"]) {
-#			print("We have ascended today and it was a gyou run. We will not Yachtzeechain this leg.", "blue");
-#			cli_execute("garbo");
-#	}
+//	else if (get_property("ascensionsToday").to_int() > 0 && available_choices["gyou"]) {
+//			print("We have ascended today and it was a gyou run. We will not Yachtzeechain this leg.", "blue");
+//			cli_execute("garbo");
+//	}
 	else if (get_property("ascensionsToday").to_int() > 0 && available_choices["cs"]) {
 		print("We have ascended today, and it was a CS run. We will Yachtzeechain this leg.", "blue");
 		unlockSleazeAirport();
@@ -82,7 +82,7 @@ void yachtzee() {
 	if (get_property("_stenchAirportToday").to_boolean())
 		buy($coinmaster[The Dinsey Company Store], available_amount($item[Funfunds&trade;]) / 20, $item[One-day ticket to dinseylandfill]);
 	if (!get_property("_sleazeAirportToday").to_boolean())
-		buy($coinmaster[Buff Jimmys Souvenir Shop], available_amount($item[Beach Buck]) / 100, $item[one-day ticket to Spring Break Beach]);
+		buy($coinmaster[Buff Jimmy's Souvenir Shop], available_amount($item[Beach Buck]) / 100, $item[one-day ticket to Spring Break Beach]);
 }
 
 void coffee() {
@@ -109,6 +109,11 @@ void ascend() {
 		abort("You have not nightcapped yet! Overdrink and burn turns, then run again!");
 	if (my_adventures() > 0)
 		abort("You have nightcapped, but have turns remaining! Burn turns, then run again!");
+//	print("Jumping through the Gash!", "teal");
+//	if (available_choices["gyou"])
+//		set_property("c2t_ascend", "2,27,2,44,8,5046,5039,2,0");
+//	else if (available_choices["cs"])
+//		set_property("c2t_ascend", "2,3,2,25,2,5046,5040,2,0");
 	wait(5);
 	cli_execute("c2t_ascend"); //c2t call to ascend. Change settings via the relay page.
 	visit_url("choice.php"); //think I still need to click thru the choice adv
