@@ -160,6 +160,8 @@ void gorb() {
 			stuck = true;
 			set_property("garbo_interrupt", "");
 		}
+		else
+			stuck = false;
 		if (beaten)
 			foreach s in $skills[Tongue of the Walrus,Cannelloni Cocoon]
 				s.use_skill();
