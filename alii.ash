@@ -1,108 +1,176 @@
 import <zlib.ash>
 
 int voa = get_property("valueOfAdventure").to_int();
-boolean[string] available_choices;
 
-// tasker
-
-void main(string settings) {
-	// task keywords
+void main(string tasks) {
+	// task keywords	
+	boolean[string] available_choices;
 	foreach key in $strings[
 		ascend,
 		coffee,
 		cs,
+		gorf,
 		nightcap,
 		pvp,
 		smoke,
 		sleep,
 		stash,
-		yachtzee
 	] available_choices[key] = false;
+
 	// abbreviations
 	string[string] abbreviations = {
-		"cloop":"coffee ascend cs smoke"
+		"gorfday":	"gorf nightcap gorf pvp",
+		"cloop":	"coffee gorfday ascend cs gorfday sleep"
 	};
-	// parse settings
-	foreach i,key in settings.to_lower_case().split_string(" ") {
+
+	// parse
+	foreach i,key in tasks.to_lower_case().split_string(" ") {
 		if (abbreviations contains key) {
-			print(`Running choice {key}!`, "teal");
-			foreach i,key in abbreviations[key].split_string(" ") {
-				available_choices[key] = true;
-				call void key();
+			foreach i,task in abbreviations[key].split_string(" ") {
+			print("Running " + task +"!", "teal");
+				available_choices[task] = true;
+				call void task();
 			}
 		}
-		else if (available_choices contains key) {
-			print(`Running choice {key}!`, "teal");
-				available_choices[key] = true;
-				call void key();
+		else if (available_choices contains task) {
+			print("Running " + task +"!", "teal");
+			available_choices[task] = true;
+			call void task();
 		}
 	}
 }
 
-// define key tasks
+// support tasks
+
+void change_clan(string clan) {
+	if (clan.to_lower_case().create_matcher(get_clan_name().to_lower_case()).find())
+		return;
+	cli_execute("/whitelist " + clan);
+	waitq(1);
+	if (!clan.to_lower_case().create_matcher(get_clan_name().to_lower_case()).find())
+		abort("couldn't get home to " + clan);
+}
+
+void gifts() {
+	string[string] messages = {
+		"Aliisza": "bagginses",
+		"ShinyPlatypus": "are they turtley enough for the turtle club",
+		"Zmonge": "I could live to be 100, and I will never type the name of this item correctly on the first go"
+	};
+	boolean[string,item] attachments = {
+		"Aliisza": $items[designer handbag, fireclutch, surprisingly capacious handbag],
+		"ShinyPlatypus": $items[box turtle, cardboard box turtle, chintzy turtle brooch, dueling turtle, furry green turtle, grinning turtle, ingot turtle, painted turtle, samurai turtle, samurai turtle helmet, sewer turtle, skeletortoise, sleeping wereturtle, soup turtle, syncopated turtle],
+		"Zmonge": $items[Stuffed MagiMechTech MicroMechaMech]
+	};
+	foreach victim in messages {
+		boolean[item] targets = attachments[victim];
+		string kmail = "kmail ";
+		boolean comma = false;
+		foreach it in targets
+			if (it.tradeable && it.available_amount() > 0) {
+				it.retrieve_item(it.available_amount());
+				kmail += (comma? ", " : "") + it.available_amount() + " " + it;
+				comma = true;
+			}
+		if (comma)
+			cli_execute(kmail + " to " + victim + " || " + messages[victim]);
+	}
+}
+
+void secondbreakfast() {
+	change_clan("Cool Guy Crew");
+	if ($item[raffle ticket].available_amount() < 1) {
+		cli_execute("breakfast");
+		cli_execute("try; raffle 1");
+		cli_execute("try; make 5 hot wad, 5 spooky wad, 5 cold wad, 5 sleaze wad, 5 stench wad, 5 twinkly wad");
+		cli_execute("acquire 5 hot wad, 5 spooky wad, 5 cold wad, 5 sleaze wad, 5 stench wad, 5 twinkly wad");
+		for i from 1 to 3 $skill[rainbow gravitation].use_skill();
+		cli_execute("try; acquire carpe");
+		if (!get_property("_essentialTofuUsed").to_boolean()) {
+			cli_execute(`buy essential tofu @{(get_property("valueOfAdventure").to_int() * 4)}`);
+			if (item_amount($item[essential tofu]) > 0)
+				use(1, $item[Essential Tofu]);
+		}
+		cli_execute("familiar left; unequip familiar; unequip off-hand; umbrella bucket");
+		cli_execute("familiar shrub; equip familiar tiny stillsuit");
+		cli_execute("familiar left");
+		visit_url("place.php?whichplace=campaway&action=campaway_sky");
+		gifts();
+/**/	cli_execute("choice_by_label false");
+/**/	cli_execute("try; autoboxer");
+		boolean no_junkmail(kmessage m) {
+			return ($strings[the loathing postal service,coolestrobot,fairygodmother,peace and love,hermiebot,sellbot,botticelli,cat noir] contains m.fromname.to_lower_case() || m.fromname.to_lower_case() == "lady spookyraven's ghost");
+		}
+		process_kmail("no_junkmail");
+		if (get_property("_clanFortuneConsultUses").to_int() < 3)
+			for x from get_property("_clanFortuneConsultUses").to_int() to 2 {
+				cli_execute("fortune coolestrobot salt batman thick");
+				waitq(5);
+			}
+	}
+}
+
+// key tasks
 
 void stash() {
-	cli_execute("/whitelist The Consortium of the Syndicate of the Kingdom");
-	waitq(2);
+	change_clan("The Consortium of the Syndicate of the Kingdom");
 	foreach f in $familiars[left-hand man, disembodied hand]
-		cli_execute("try; familiar "+f+"; unequip familiar;");
-	outfit('birthday suit');
+		cli_execute("try; familiar "+f+"; unequip familiar");
+	outfit("birthday suit");
 	foreach it in $items[Bag o Tricks, Crown of Thrones, defective Game Grid token, Pantsgiving, Platinum Yendorian Express Card, Spooky Putty sheet, Talisman of Baio, defective Game Grid token, haiku katana, mafia pointer finger ring]
 		if (it.available_amount() > 0 && get_clan_name() == 'The Consortium of the Syndicate of the Kingdom' && it.stash_amount() < 1)
 			cli_execute("try; stash put 1 " + it );
-	cli_execute("/whitelist Cool Guy Crew");
-	waitq(2);
+	change_clan("Cool Guy Crew");
 }
 
-void yachtzee() {
-	void unlockSleazeAirport() {
-		if (!get_property("_sleazeAirportToday").to_boolean()) {
-			if (available_amount($item[one-day ticket to Spring Break Beach]) < 1)
-				buy(1, $item[one-day ticket to Spring Break Beach], 400000);
-			cli_execute("try; use one-day ticket to Spring Break Beach");
-		}
-	}
-	cli_execute("/whitelist Cool Guy Crew");
- 	waitq(2);
-	cli_execute("try; acquire carpe");
-	if (my_inebriety() > inebriety_limit()) {
-		print("We're overdrunk. Running Garbo overdrunk turns.", "blue");
-		cli_execute("garbo");
-		return;
-	}
-	else if (get_property("ascensionsToday").to_int() > 0 && available_choices["cs"]) {
-		print("We have ascended today, and it was a CS run. We will Yachtzeechain this leg.", "blue");
-		unlockSleazeAirport();
-		cli_execute("garbo yachtzeechain");
-	}
-	else {
-		print("We have not ascended today. Breakfast leg always does Yachtzee!", "blue");
-		unlockSleazeAirport();
-		cli_execute("garbo yachtzeechain ascend workshed=cmc");
-	}
+void pvp() {
+	change_clan("Cool Guy Crew");
+	cli_execute("familiar left");
+	cli_execute("unequip familiar");
+	cli_execute("outfit nothing");
+	$location[noob cave].set_location();
+	for i from 1 to 2 cli_execute("maximize 9.887 cold res, booze drop, -14 com;");
+	cli_execute("pvp_mab");
+}
 
+void coffee() {
+	stash();
+	cli_execute("git update; svn update;");
+	mall_prices('allitems');
+	change_clan("Cool Guy Crew");
+	cli_execute("breakfast");
+	secondbreakfast();
+	pvp();
+}
+
+void gorf() {
+	change_clan("Cool Guy Crew");
+ 	cli_execute("ptrack add gorfStart");
+	cli_execute("try; acquire carpe");
+	boolean beaten = true;
+	while(beaten) {
+		if (my_inebriety() > inebriety_limit() || get_property("ascensionsToday").to_int() > 0)
+			cli_execute("try; garbo");
+		else
+			cli_execute("try; garbo ascend workshed=cmc");
+		beaten = ($effect[Beaten Up].have_effect() > 0);
+		if (beaten)
+			foreach s in $skills[Tongue,Coco]
+				s.use_skill();
+	}
 	cli_execute("shop put -3 park garb @ 210;");
 	cli_execute("use * gathered meat;");
 	foreach it in $items[meat stack, dense meat stack, cheap sunglasses, expensive camera, fat stacks of cash, knob visor, embezzler oil]
 		cli_execute(`autosell * {it}`);
 	if (get_property("_stenchAirportToday").to_boolean())
 		buy($coinmaster[The Dinsey Company Store], available_amount($item[Funfunds&trade;]) / 20, $item[One-day ticket to dinseylandfill]);
-	if (get_property("_sleazeAirportToday").to_boolean())
-		buy($coinmaster[Buff Jimmys Souvenir Shop], available_amount($item[Beach Buck]) / 100, $item[one-day ticket to Spring Break Beach]);
 	stash();
-}
-
-void pvp() {
-	cli_execute('/wl cool guy crew');
-	cli_execute("familiar left;");
-	cli_execute("unequip familiar;");
-	cli_execute("outfit nothing;");
-	set_location($location[noob cave]);
-	cli_execute("maximize hat,shirt,pants,da; maximize -hat,-shirt,-pants,hot damage, hot spell damage;");
-	cli_execute("pvp loot Hot;");
+	cli_execute("ptrack add gorfDone");
 }
 
 void nightcap() {
+	if (my_adventures() > 0)
+		abort("Rethink overdrinking...");
 	cli_execute("familiar stooper;");
 	cli_execute("shrug ur-kel;");
 	cli_execute("shrug polka of plenty;");
@@ -111,25 +179,18 @@ void nightcap() {
 	cli_execute(`consume all nomeat nightcap value {voa} valuepvp {voa};`.to_upper_case());
 }
 
-void coffee() {
-	cli_execute('git update; svn update;');
-	mall_prices('allitems');
-	print("Aftercore day, start to finish", "teal");
-	cli_execute("ptrack add coffeeBegin");
-	cli_execute("/whitelist Cool Guy Crew");
-	cli_execute("secondbreakfast");
-	yachtzee();
+void gorfday() {
+	gorf();
 	nightcap();
-	yachtzee();
+	gorf();
 	pvp();
-	cli_execute("ptrack add coffeeEnd");
 }
 
 void ascend() {
 	if (my_inebriety() <= inebriety_limit())
-		abort("You have not nightcapped yet! Overdrink and burn turns, then run again!");
+		abort("Overdrink first!!");
 	if (my_adventures() > 0)
-		abort("You have nightcapped, but have turns remaining! Burn turns, then run again!");
+		abort("Turns remain!!");
 	wait(5);
 	cli_execute("c2t_ascend"); //c2t call to ascend. Change settings via the relay page.
 	visit_url("choice.php"); //think I still need to click thru the choice adv
@@ -138,21 +199,11 @@ void ascend() {
 }
 
 void cs() {
-	print("Running CS!", "teal");
-	print("ptrack add csBegin");
+	cli_execute("ptrack add csStart");
 	cli_execute("c2t_hccs");
 	cli_execute("prism");
 	cli_execute("acquire deep dish of legend, calzone of legend, pizza of legend");
-}
-
-void smoke() {
-	print("Running garbo and ending the day off!", "teal");
-	cli_execute("ptrack add smokeBegin");
-	yachtzee();
-	nightcap();
-	yachtzee();
-	pvp();
-	cli_execute("ptrack add smokeEnd");	
+	cli_execute("ptrack add csEnd");
 }
 
 void sleep() {
@@ -167,5 +218,4 @@ void sleep() {
 	cli_execute("maximize 1.1 adv, fites;");
 	cli_execute("3d_itemguard;");
 	cli_execute("pTrack recap");
-	print("Done!", "teal");
 }
