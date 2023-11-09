@@ -148,7 +148,7 @@ void gorb() {
 	cli_execute("try; acquire carpe");
 	boolean beaten = true;
 	boolean stuck = false;
-	while(beaten) {
+	while (beaten) {
 		if (my_inebriety() > inebriety_limit() || get_property("ascensionsToday").to_int() > 0)
 			cli_execute("try; garbo");
 		else
@@ -163,6 +163,8 @@ void gorb() {
 		if (beaten)
 			foreach s in $skills[Tongue of the Walrus,Cannelloni Cocoon]
 				s.use_skill();
+		stash();
+		set_property("garboStashItems","");
 	}
 	cli_execute("shop put -3 park garb @ 210;");
 	cli_execute("use * gathered meat;");
@@ -170,7 +172,6 @@ void gorb() {
 		cli_execute(`autosell * {it}`);
 	if (get_property("_stenchAirportToday").to_boolean())
 		buy($coinmaster[The Dinsey Company Store], available_amount($item[Funfunds&trade;]) / 20, $item[One-day ticket to dinseylandfill]);
-	stash();
 	cli_execute("ptrack add gorbDone");
 }
 
