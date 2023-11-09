@@ -9,18 +9,17 @@ void main(string tasks) {
 		ascend,
 		coffee,
 		cs,
-		gorf,
+		gorb,
 		nightcap,
 		pvp,
-		smoke,
 		sleep,
-		stash,
+		stash
 	] available_choices[key] = false;
 
 	// abbreviations
 	string[string] abbreviations = {
-		"gorfday":	"gorf nightcap gorf pvp",
-		"cloop":	"coffee gorfday ascend cs gorfday sleep"
+		"gorbday":	"gorb nightcap gorb pvp",
+		"cloop":	"coffee gorbday ascend cs gorbday sleep"
 	};
 
 	// parse
@@ -32,10 +31,10 @@ void main(string tasks) {
 				call void task();
 			}
 		}
-		else if (available_choices contains task) {
-			print("Running " + task +"!", "teal");
-			available_choices[task] = true;
-			call void task();
+		else if (available_choices contains key) {
+			print("Running " + key +"!", "teal");
+			available_choices[key] = true;
+			call void key();
 		}
 	}
 }
@@ -77,6 +76,10 @@ void gifts() {
 	}
 }
 
+boolean no_junkmail(kmessage m) {
+	return ($strings[lady spookyraven's ghost,the loathing postal service,coolestrobot,fairygodmother,peace and love,hermiebot,sellbot,botticelli,cat noir] contains m.fromname.to_lower_case());
+}
+
 void secondbreakfast() {
 	change_clan("Cool Guy Crew");
 	if ($item[raffle ticket].available_amount() < 1) {
@@ -98,9 +101,6 @@ void secondbreakfast() {
 		gifts();
 /**/	cli_execute("choice_by_label false");
 /**/	cli_execute("try; autoboxer");
-		boolean no_junkmail(kmessage m) {
-			return ($strings[the loathing postal service,coolestrobot,fairygodmother,peace and love,hermiebot,sellbot,botticelli,cat noir] contains m.fromname.to_lower_case() || m.fromname.to_lower_case() == "lady spookyraven's ghost");
-		}
 		process_kmail("no_junkmail");
 		if (get_property("_clanFortuneConsultUses").to_int() < 3)
 			for x from get_property("_clanFortuneConsultUses").to_int() to 2 {
@@ -135,27 +135,33 @@ void pvp() {
 
 void coffee() {
 	stash();
-	cli_execute("git update; svn update;");
-	mall_prices('allitems');
-	change_clan("Cool Guy Crew");
+//	cli_execute("git update; svn update");
+//	mall_prices("allitems");
 	cli_execute("breakfast");
 	secondbreakfast();
 	pvp();
 }
 
-void gorf() {
+void gorb() {
 	change_clan("Cool Guy Crew");
- 	cli_execute("ptrack add gorfStart");
+ 	cli_execute("ptrack add gorbStart");
 	cli_execute("try; acquire carpe");
 	boolean beaten = true;
+	boolean stuck = false;
 	while(beaten) {
 		if (my_inebriety() > inebriety_limit() || get_property("ascensionsToday").to_int() > 0)
 			cli_execute("try; garbo");
 		else
 			cli_execute("try; garbo ascend workshed=cmc");
 		beaten = ($effect[Beaten Up].have_effect() > 0);
+		if (get_property("garbo_interrupt") == "true") {
+			if (stuck)
+				abort("rerunning garbo didn't help");
+			stuck = true;
+			set_property("garbo_interrupt", "");
+		}
 		if (beaten)
-			foreach s in $skills[Tongue,Coco]
+			foreach s in $skills[Tongue of the Walrus,Cannelloni Cocoon]
 				s.use_skill();
 	}
 	cli_execute("shop put -3 park garb @ 210;");
@@ -165,7 +171,7 @@ void gorf() {
 	if (get_property("_stenchAirportToday").to_boolean())
 		buy($coinmaster[The Dinsey Company Store], available_amount($item[Funfunds&trade;]) / 20, $item[One-day ticket to dinseylandfill]);
 	stash();
-	cli_execute("ptrack add gorfDone");
+	cli_execute("ptrack add gorbDone");
 }
 
 void nightcap() {
@@ -179,10 +185,10 @@ void nightcap() {
 	cli_execute(`consume all nomeat nightcap value {voa} valuepvp {voa};`.to_upper_case());
 }
 
-void gorfday() {
-	gorf();
+void gorbday() {
+	gorb();
 	nightcap();
-	gorf();
+	gorb();
 	pvp();
 }
 
