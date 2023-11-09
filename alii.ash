@@ -77,7 +77,7 @@ void gifts() {
 }
 
 boolean no_junkmail(kmessage m) {
-	return ($strings[lady spookyraven's ghost,the loathing postal service,coolestrobot,fairygodmother,peace and love,hermiebot,sellbot,botticelli,cat noir] contains m.fromname.to_lower_case());
+	return ($strings[the loathing postal service,coolestrobot,fairygodmother,peace and love,hermiebot,sellbot,botticelli,cat noir] contains m.fromname.to_lower_case() || m.fromname.to_lower_case() == "lady spookyraven's ghost");
 }
 
 void secondbreakfast() {
