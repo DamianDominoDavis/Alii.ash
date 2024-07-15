@@ -16,9 +16,9 @@ void main(string tasks) {
 
 	// abbreviations (expanding keywords)
 	string[string] abbreviations = {
+		"gorbday":	"coffee gorb nightcap",
 		"leg1":		"gorbday gorb pvp",
 		"leg2":		"gorbday pvp sleep",
-		"gorbday":	"coffee gorb nightcap",
 		"cloop":	"leg1 ascend_cs leg2",
 		"roboloop":	"leg1 ascend_yr leg2",
 	};
@@ -59,19 +59,19 @@ void change_clan(string clan) {
 		chat_clan("/whitelist " + clan);
 		waitq(2);
 		if (!find(create_matcher(to_lower_case(clan), to_lower_case(get_clan_name()))))
-			abort("couldn\'t get home to " + clan);
+			abort("couldn't get home to " + clan);
 	}
 }
 
 boolean no_junkmail(kmessage m) {
-	return ($strings[lady spookyraven\'s ghost, the loathing postal service, coolestrobot, fairygodmother, peace and love, torturebot, hermiebot, sellbot, botticelli, cat noir, onlyfax] contains to_lower_case(m.fromname));
+	return ($strings[lady spookyraven's ghost, the loathing postal service, coolestrobot, fairygodmother, peace and love, torturebot, hermiebot, sellbot, botticelli, cat noir, onlyfax] contains to_lower_case(m.fromname));
 }
 
 void pizzeria() {
 		foreach it in $items[pizza of legend, calzone of legend, deep dish of legend]
 		if (!to_boolean(available_amount(it)))
 			create(it);
-	foreach it in $items[baked veggie ricotta casserole, plain calzone, roasted vegetable focaccia, Boris\'s bread, roasted vegetable of Jarlsberg, Pete\'s rich ricotta]
+	foreach it in $items[baked veggie ricotta casserole, plain calzone, roasted vegetable focaccia, Boris's bread, roasted vegetable of Jarlsberg, Pete's rich ricotta]
 		if (available_amount(it) < 3)
 			create(3, it);
 }
@@ -161,7 +161,7 @@ void secondbreakfast() {
 
 void resong(boolean[effect] gain) {
 	void unsong(boolean[effect] except) {
-		foreach e in $effects[Aloysius\' Antiphon of Aptitude, The Moxious Madrigal, Cletus\'s Canticle of Celerity, Polka of Plenty, The Magical Mojomuscular Melody, Power Ballad of the Arrowsmith, Brawnee\'s Anthem of Absorption, Fat Leon\'s Phat Loot Lyric, Psalm of Pointiness, Jackasses\' Symphony of Destruction, Stevedave\'s Shanty of Superiority, Ode to Booze, The Sonata of Sneakiness, Carlweather\'s Cantata of Confrontation, Ur-Kel\'s Aria of Annoyance, Dirge of Dreadfulness, Paul\'s Passionate Pop Song, Dirge of Dreadfulness (Remastered)]
+		foreach e in $effects[Aloysius' Antiphon of Aptitude, The Moxious Madrigal, Cletus's Canticle of Celerity, Polka of Plenty, The Magical Mojomuscular Melody, Power Ballad of the Arrowsmith, Brawnee's Anthem of Absorption, Fat Leon's Phat Loot Lyric, Psalm of Pointiness, Jackasses' Symphony of Destruction, Stevedave's Shanty of Superiority, Ode to Booze, The Sonata of Sneakiness, Carlweather's Cantata of Confrontation, Ur-Kel's Aria of Annoyance, Dirge of Dreadfulness, Paul's Passionate Pop Song, Dirge of Dreadfulness (Remastered)]
 			if (!(except contains e) && to_boolean(have_effect(e)) && is_shruggable(e)) {
 				cli_execute("shrug " + e);
 				if (!to_boolean(have_effect(e)))
@@ -210,7 +210,7 @@ void funeral() {
 void stash() {
 	change_clan("The Consortium of the Syndicate of the Kingdom");
 	get_nude();
-	foreach it in $items[Bag o\' Tricks, Crown of Thrones, defective Game Grid token, Pantsgiving, Platinum Yendorian Express Card, Spooky Putty sheet, Talisman of Baio, defective Game Grid token, haiku katana, mafia pointer finger ring, bittycar meatcar, repaid diaper, incredibly dense meat gem]
+	foreach it in $items[Bag o' Tricks, Crown of Thrones, defective Game Grid token, Pantsgiving, Platinum Yendorian Express Card, Spooky Putty sheet, Talisman of Baio, defective Game Grid token, haiku katana, mafia pointer finger ring, bittycar meatcar, repaid diaper, incredibly dense meat gem]
 		if (to_boolean(available_amount(it)) && to_lower_case(get_clan_name()) == "the consortium of the syndicate of the kingdom" && !to_boolean(stash_amount(it))) {
 			retrieve_item(it);
 			put_stash(1, it);
@@ -264,7 +264,7 @@ void gorb() {
 		beaten = to_boolean(have_effect($effect[Beaten Up])) || starts_with(get_property("lastEncounter"), "Sssshh");
 		if (to_boolean(get_property("garbo_interrupt"))) {
 			if (stuck)
-				abort("rerunning garbo didn\'t help");
+				abort("rerunning garbo didn't help");
 			stuck = true;
 			set_property("garbo_interrupt", "");
 		}
@@ -276,7 +276,7 @@ void gorb() {
 	}
 	put_shop(210, 0, item_amount($item[bag of park garbage]) - 3, $item[bag of park garbage]);
 	use($item[Gathered Meat-Clip], item_amount($item[Gathered Meat-Clip]));
-	foreach it in $items[meat stack, dense meat stack, cheap sunglasses, expensive camera, fat stacks of cash, Knob Goblin visor, embezzler\'s oil]
+	foreach it in $items[meat stack, dense meat stack, cheap sunglasses, expensive camera, fat stacks of cash, Knob Goblin visor, embezzler's oil]
 		autosell(it, item_amount(it));
 	if (to_boolean(to_int(get_property("_stenchAirportToday"))) && available_amount($item[Funfunds&trade;]) >= 20) {
 		retrieve_item($item[Funfunds&trade;], available_amount($item[Funfunds&trade;]));
@@ -340,7 +340,7 @@ void ascend_cs() {
 
 	string guildhall = visit_url("guild.php?place=challenge");
 	if (!contains_text(guildhall, "paco")) {
-		location chore = $location[The Outskirts of Cobb\'s Knob];
+		location chore = $location[The Outskirts of Cobb's Knob];
 		if (my_primestat() == $stat[mysticality])
 			chore = $location[The Haunted Pantry];
 		if (my_primestat() == $stat[moxie])
@@ -349,7 +349,7 @@ void ascend_cs() {
 		resong($effects[Ode to Booze, Carlweather's Cantata of Confrontation, Musk of the Moose]);
 		cli_execute("maximize 100 com, familiar weight");
 		for _ from 1 to 8
-			if (!($strings[Now\'s Your Pants! I Mean... Your Chance!, A Sandwich Appears!, Up In Their Grill] contains get_property("lastEncounter")))
+			if (!($strings[Now's Your Pants! I Mean... Your Chance!, A Sandwich Appears!, Up In Their Grill] contains get_property("lastEncounter")))
 				adv1(chore, 0, "runaway; abort;");
 		guildhall = visit_url("guild.php?place=challenge");
 		if (!contains_text(guildhall, "paco"))
