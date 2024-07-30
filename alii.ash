@@ -1,26 +1,28 @@
 import <zlib>
 
 void main(string tasks) {
-	// task keywords (named functions)
+	// key tasks
 	boolean[string] available_choices = $strings[
 		coffee,
-		ascend_cs,
-		ascend_yr,
 		gorb,
+		stash,
 		nightcap,
-		forcenightcap,
 		pvp,
-		sleep,
-		stash
+		ascend_cs,
+		ascend_smol,
+		ascend_yr,
+		forcenightcap,
+		sleep
 	];
 
-	// abbreviations (expanding keywords)
+	// task patterns
 	string[string] abbreviations = {
 		"gorbday":	"coffee gorb nightcap",
 		"leg1":		"gorbday gorb pvp",
 		"leg2":		"gorbday pvp sleep",
-		"cloop":	"leg1 ascend_cs leg2",
-		"roboloop":	"leg1 ascend_yr leg2",
+		"loop_cs":	"leg1 ascend_cs leg2",
+		"loop_smol":"leg1 ascend_smol leg2",
+		"loop_yr":	"leg1 ascend_yr leg2",
 	};
 
 	// parser
@@ -43,7 +45,7 @@ void main(string tasks) {
 
 void get_nude() {
 	foreach f in $familiars[left-hand man, disembodied hand, mad hatrack, fancypants scarecrow]
-		if (have_familiar(f) && can_equip(f) && familiar_equipped_equipment(f) != $item[none])
+		if (have_familiar(f) && familiar_equipped_equipment(f) != $item[none])
 			equip($item[none], f);
 	outfit("nothing");
 }
@@ -63,116 +65,26 @@ void change_clan(string clan) {
 	}
 }
 
-boolean no_junkmail(kmessage m) {
-	return ($strings[lady spookyraven's ghost, the loathing postal service, coolestrobot, fairygodmother, peace and love, torturebot, hermiebot, sellbot, botticelli, cat noir, onlyfax] contains to_lower_case(m.fromname));
-}
-
-void pizzeria() {
-		foreach it in $items[pizza of legend, calzone of legend, deep dish of legend]
-		if (!to_boolean(available_amount(it)))
-			create(it);
-	foreach it in $items[baked veggie ricotta casserole, plain calzone, roasted vegetable focaccia, Boris's bread, roasted vegetable of Jarlsberg, Pete's rich ricotta]
-		if (available_amount(it) < 3)
-			create(3, it);
-}
-
-void secondbreakfast() {
-	change_clan("Cool Guy Crew");
-	if (11 < item_amount($item[raffle ticket]) + storage_amount($item[raffle ticket]) + closet_amount($item[raffle ticket]) + display_amount($item[raffle ticket]))
-		cli_execute("raffle 11");
-	foreach it in $items[hot wad, spooky wad, cold wad, sleaze wad, stench wad] {
-		if (available_amount(it) < 3)
-			create(3, it);
-		retrieve_item(3, it);
-	}
-	for _ from 1 to 3
-		use_skill($skill[rainbow gravitation]);
-	if (!to_boolean(get_property("_floundryItemCreated")))
-		retrieve_item($item[carpe]);
-	if (!to_boolean(get_property("_essentialTofuUsed"))) {
-		buy(2 - available_amount($item[essential tofu]), $item[essential tofu], 4 * to_int(get_property("valueOfAdventure")));
-		if (to_boolean(available_amount($item[essential tofu]))) {
-			retrieve_item($item[essential tofu]);
-			use($item[Essential Tofu]);
-		}
-	}
-	get_nude();
-	cli_execute("umbrella bucket");
-	if (familiar_equipped_equipment($familiar[crimbo shrub]) != $item[tiny stillsuit]) {
-		retrieve_item($item[tiny stillsuit]);
-		equip($item[tiny stillsuit], $familiar[crimbo shrub]);
-	}
-	use_familiar($familiar[left-hand man]);
-	visit_url("place.php?whichplace=campaway&action=campaway_sky");
-	cli_execute("choice_by_label false");
-	cli_execute("autoboxer");
-	foreach trophy in $items[residual chitin paste]
-		put_display(item_amount(trophy), trophy);
-	if (to_int(get_property("_clanFortuneConsultUses")) < 3)
-		for _ from to_int(get_property("_clanFortuneConsultUses")) to 2 {
-			cli_execute("fortune coolestrobot salt batman thick");
-			waitq(5);
-		}
-	process_kmail("no_junkmail");
-	cli_execute("backupcamera reverser enable");
-	foreach it in $items[wardrobe-o-matic, csa fire-starting kit, confusing led clock] {
-		retrieve_item(it);
-		use(it);
-	}
-	visit_url("campground.php?action=rest");
-	pizzeria();
-	use_familiar($familiar[chest mimic]);
-	cli_execute("try; mayam resonance yamtility belt; mayam rings fur bottle cheese clock; mayam rings eye lightning yam explosion");
-	if (to_boolean(available_amount($item[designer sweatpants]))) {
-		int booze_casts = min(3, min(my_inebriety(), to_int(get_property("sweat")) / 25));
-		use_skill(booze_casts, $skill[sweat out some booze]);
-	}
-	if (to_boolean(item_amount($item[autumn-aton])) && !to_boolean(to_int(get_property("autumnatonUpgrades"))))
-		cli_execute("autumnaton upgrade");
-	void gifts() {
-		string[string] messages = {
-			"Aliisza": "bagginses",
-			"ShinyPlatypus": "are they turtley enough for the turtle club",
-			"Zmonge": "I could live to be 100, and I will never type the name of this item correctly on the first go"
-		};
-		boolean[string, item] attachments = {
-			"Aliisza": $items[designer handbag, fireclutch, surprisingly capacious handbag],
-			"ShinyPlatypus": $items[box turtle, cardboard box turtle, chintzy turtle brooch, dueling turtle, furry green turtle, grinning turtle, ingot turtle, painted turtle, samurai turtle, samurai turtle helmet, sewer turtle, skeletortoise, sleeping wereturtle, soup turtle, syncopated turtle],
-			"Zmonge": $items[Stuffed MagiMechTech MicroMechaMech]
-		};
-		foreach victim in messages {
-			string kmail = "kmail ";
-			boolean comma = false;
-			foreach it in attachments[victim]
-				if (it.tradeable && to_boolean(available_amount(it))) {
-					retrieve_item(it, available_amount(it));
-					if (comma)
-						kmail += ", ";
-					kmail += item_amount(it) + " " + it;
-					comma = true;
-				}
-			if (comma)
-				cli_execute(kmail + " to " + victim + " || " + messages[victim]);
-		}
-	}
-	gifts();
-	cli_execute("3d_itemguard;");
-}
-
 void resong(boolean[effect] gain) {
 	void unsong(boolean[effect] except) {
-		foreach e in $effects[Aloysius' Antiphon of Aptitude, The Moxious Madrigal, Cletus's Canticle of Celerity, Polka of Plenty, The Magical Mojomuscular Melody, Power Ballad of the Arrowsmith, Brawnee's Anthem of Absorption, Fat Leon's Phat Loot Lyric, Psalm of Pointiness, Jackasses' Symphony of Destruction, Stevedave's Shanty of Superiority, Ode to Booze, The Sonata of Sneakiness, Carlweather's Cantata of Confrontation, Ur-Kel's Aria of Annoyance, Dirge of Dreadfulness, Paul's Passionate Pop Song, Dirge of Dreadfulness (Remastered)]
-			if (!(except contains e) && to_boolean(have_effect(e)) && is_shruggable(e)) {
+		foreach e in $effects[Ode to Booze, Dirge of Dreadfulness, The Sonata of Sneakiness, Carlweather's Cantata of Confrontation, The Moxious Madrigal, Aloysius' Antiphon of Aptitude, The Magical Mojomuscular Melody, Cletus's Canticle of Celerity, Polka of Plenty, Power Ballad of the Arrowsmith, Brawnee's Anthem of Absorption, Fat Leon's Phat Loot Lyric, Psalm of Pointiness, Jackasses' Symphony of Destruction, Stevedave's Shanty of Superiority, Ur-Kel's Aria of Annoyance, Paul's Passionate Pop Song, Dirge of Dreadfulness (Remastered)]
+			if (!(except contains e) && to_boolean(have_effect(e))) {
 				cli_execute("shrug " + e);
 				if (!to_boolean(have_effect(e)))
 					return;
-				print("failed to remove active song "+e, "red");
+				abort("failed to remove active song "+e);
 			}
 	}
+	int room = 3;
+	foreach mod in $strings[four songs, additional song]
+		if (boolean_modifier(mod))
+			room += 1;
+	if (room < count(gain))
+		abort("neil cicirega you are not");
 	foreach e in gain
-		if (e.song && contains_text(e.default, "cast 1")) {
+		if (e.song && have_skill(to_skill(group_string(e.default, "cast 1 (.+)")[0][1])) && !to_boolean(have_effect(e))) {
 			cli_execute(e.default);
-			for _ from 1 to 7 // while, but I have a bad feeling...
+			for _ from 1 to room
 				if (!to_boolean(have_effect(e))) {
 					unsong(gain);
 					cli_execute(e.default);
@@ -180,29 +92,34 @@ void resong(boolean[effect] gain) {
 		}
 }
 
-void birthday() {
+void fresh_hell(string c2t) {
+	if (to_boolean(to_int(get_property("ascensionsToday"))))
+		abort("one gash a night, buddy");
+	if (my_inebriety() <= inebriety_limit())
+		abort("overdrink first");
+	if (to_boolean(my_adventures()))
+		abort("turns remain");
+	if (my_garden_type() != "thanksgarden")
+		use($item[packet of thanksgarden seeds]);
+	cli_execute("try; garden harvest");
+		foreach it in $items[pizza of legend, calzone of legend, deep dish of legend, battery (car), battery (lantern), battery (AAA), battery (9-Volt), battery (D), battery (AA)]
+		if (!to_boolean(available_amount(it)))
+			create(it);
+	foreach it in $items[baked veggie ricotta casserole, plain calzone, roasted vegetable focaccia, Boris's bread, roasted vegetable of Jarlsberg, Pete's rich ricotta]
+		if (available_amount(it) < 3)
+			create(3, it);
+	foreach it in $items[ol' scratch's salad fork, frosty's frosty mug]
+		retrieve_item(it);
+	wait(5);
+	set_property("c2t_ascend", c2t);
+	cli_execute("c2t_ascend");
 	if (!handling_choice())
 		visit_url("choice.php");
 	if (handling_choice())
 		run_choice(1);
 	cli_execute("backupcamera reverser enable");
-	string pvp = visit_url("peevpee.php?action=smashstone&pwd&confirm=on", true);
-	if(contains_text(pvp, "Pledge allegiance to"))
+	if (contains_text(visit_url("peevpee.php?action=smashstone&pwd&confirm=on", true), "Pledge allegiance to"))
 		visit_url("peevpee.php?action=pledge&place=fight&pwd");
-}
-
-void funeral() {
-	if (!to_boolean(to_int(get_property("ascensionsToday")))) {
-		if (my_inebriety() <= inebriety_limit())
-			abort("Overdrink first!!");
-		if (to_boolean(my_adventures()))
-			abort("Turns remain!!");
-		if (my_garden_type() != "thanksgarden")
-			use($item[packet of thanksgarden seeds]);
-		cli_execute("try; garden harvest");
-		pizzeria();
-		wait(5);
-	}
 }
 
 // key tasks
@@ -230,11 +147,16 @@ void pvp() {
 	equip(it, $slot[familiar]);
 	maximize("-shirt, -hat, -pants, -familiar, item, -equip champ", false);
 	if (to_boolean(pvp_attacks_left()))
-		cli_execute("pvp fame optimal pvp");
+		cli_execute("pvp fame optimal dresser");
+
+	boolean no_junkmail(kmessage m) {
+		return ($strings[lady spookyraven's ghost, the loathing postal service, coolestrobot, fairygodmother, peace and love, torturebot, hermiebot, sellbot, botticelli, cat noir, onlyfax] contains to_lower_case(m.fromname));
+	}	
+	process_kmail("no_junkmail");
 }
 
 void coffee() {
-	if (to_boolean(get_property("_confusingLEDClockUsed")))
+	if (!can_interact() || to_boolean(get_property("_fireStartingKitUsed")))
 		return;
 	stash();
 	mall_prices("allitems");
@@ -242,18 +164,90 @@ void coffee() {
 		cli_execute("ptrack add start");
 	set_property("_garbageItemChanged", "true");
 	cli_execute("breakfast");
-	secondbreakfast();
+	if (11 < item_amount($item[raffle ticket]) + storage_amount($item[raffle ticket]) + closet_amount($item[raffle ticket]) + display_amount($item[raffle ticket]))
+		cli_execute("raffle 11");
+	foreach it in $items[hot wad, spooky wad, cold wad, sleaze wad, stench wad] {
+		if (available_amount(it) < 3)
+			cli_execute("try; make " + (3 - available_amount(it)) + " " + it);
+		retrieve_item(3, it);
+	}
+	for _ from 1 to 3
+		use_skill($skill[rainbow gravitation]);
+	if (!to_boolean(get_property("_floundryItemCreated")))
+		retrieve_item($item[carpe]);
+	if (!to_boolean(get_property("_essentialTofuUsed"))) {
+		buy(2 - available_amount($item[essential tofu]), $item[essential tofu], 4 * to_int(get_property("valueOfAdventure")));
+		if (to_boolean(available_amount($item[essential tofu]))) {
+			retrieve_item($item[essential tofu]);
+			use($item[Essential Tofu]);
+		}
+	}
+	if (familiar_equipped_equipment($familiar[crimbo shrub]) != $item[tiny stillsuit]) {
+		retrieve_item($item[tiny stillsuit]);
+		equip($item[tiny stillsuit], $familiar[crimbo shrub]);
+	}
+	visit_url("place.php?whichplace=campaway&action=campaway_sky");
+	cli_execute("choice_by_label false");
+	cli_execute("autoboxer");
+	foreach trophy in $items[residual chitin paste]
+		put_display(item_amount(trophy), trophy);
+	if (to_int(get_property("_clanFortuneConsultUses")) < 3)
+		for _ from to_int(get_property("_clanFortuneConsultUses")) to 2 {
+			cli_execute("fortune coolestrobot salt batman thick");
+			waitq(5);
+		}
+	cli_execute("backupcamera reverser enable");
+	cli_execute("mallbuy confusing led clock");
+	foreach it in $items[wardrobe-o-matic, csa fire-starting kit, confusing led clock] {
+		retrieve_item(it);
+		use(it);
+	}
+	visit_url("campground.php?action=rest");
+	cli_execute("try; mayam resonance yamtility belt; mayam rings fur bottle cheese clock; mayam rings eye lightning yam explosion");
+	if (to_boolean(available_amount($item[designer sweatpants]))) {
+		int booze_casts = min(3, min(my_inebriety(), to_int(get_property("sweat")) / 25));
+		use_skill(booze_casts, $skill[sweat out some booze]);
+	}
+	cli_execute("try; autumnaton upgrade");
+	string[string] messages = {
+		"Aliisza": "bagginses",
+		"ShinyPlatypus": "are they turtley enough for the turtle club",
+		"Zmonge": "I could live to be 100, and I will never type the name of this item correctly on the first go"
+	};
+	boolean[string, item] attachments = {
+		"Aliisza": $items[designer handbag, fireclutch, surprisingly capacious handbag],
+		"ShinyPlatypus": $items[box turtle, cardboard box turtle, chintzy turtle brooch, dueling turtle, furry green turtle, grinning turtle, ingot turtle, painted turtle, samurai turtle, samurai turtle helmet, sewer turtle, skeletortoise, sleeping wereturtle, soup turtle, syncopated turtle],
+		"Zmonge": $items[Stuffed MagiMechTech MicroMechaMech]
+	};
+	foreach victim in messages {
+		string kmail = "kmail ";
+		boolean comma = false;
+		foreach it in attachments[victim]
+			if (it.tradeable && to_boolean(available_amount(it))) {
+				retrieve_item(it, available_amount(it));
+				if (comma)
+					kmail += ", ";
+				kmail += item_amount(it) + " " + it;
+				comma = true;
+			}
+		if (comma)
+			cli_execute(kmail + " to " + victim + " || " + messages[victim]);
+	}
 	pvp();
+	cli_execute("3d_itemguard;");
 }
 
 void gorb() {
 	change_clan("Cool Guy Crew");
 	if (!to_boolean(get_property("_floundryItemCreated")))
 		retrieve_item($item[carpe]);
+	visit_url("place.php?whichplace=twitch");
 	boolean beaten = true;
 	boolean stuck = false;
 	while (beaten) {
 		string garbo = "garbo candydish";
+		if (to_boolean(get_property("timeTowerAvailable")) && my_inebriety() < inebriety_limit())
+			garbo += " nobarf";
 		if (get_workshed() != $item[model train set])
 			garbo += " workshed=mts";
 		else
@@ -278,69 +272,50 @@ void gorb() {
 	use($item[Gathered Meat-Clip], item_amount($item[Gathered Meat-Clip]));
 	foreach it in $items[meat stack, dense meat stack, cheap sunglasses, expensive camera, fat stacks of cash, Knob Goblin visor, embezzler's oil]
 		autosell(it, item_amount(it));
-	if (to_boolean(to_int(get_property("_stenchAirportToday"))) && available_amount($item[Funfunds&trade;]) >= 20) {
+	if (to_boolean(get_property("_stenchAirportToday")) && available_amount($item[Funfunds&trade;]) >= 20) {
 		retrieve_item($item[Funfunds&trade;], available_amount($item[Funfunds&trade;]));
 		buy($coinmaster[The Dinsey Company Store], available_amount($item[Funfunds&trade;]) / 20, $item[One-day ticket to dinseylandfill]);
 	}
-	process_kmail("no_junkmail");
+	if (to_boolean(get_property("timeTowerAvailable")) && contains_text(get_property("_garboCompleted"), "nobarf"))
+		cli_execute("chrono mode=rose turns=-0");
 }
 
 void forcenightcap() {
-	if ((my_inebriety() < inebriety_limit()) ^ (my_familiar() != $familiar[stooper])) {
-		resong($effects[ode to booze]);
+	if (my_inebriety() < inebriety_limit() || (my_inebriety() == inebriety_limit() && my_familiar() != $familiar[stooper]))
 		cli_execute("drinksilent stillsuit distillate");
-	}
+	use_familiar($familiar[stooper]);
 	float voa = to_int(get_property("valueOfAdventure"));
 	if (to_boolean(to_int(get_property("ascensionsToday"))))
 		voa *= 0.75;
-	string consume = "consume all nomeat nightcap value " + get_property("valueOfAdventure") + "valuepvp " + to_int(voa);
+	resong($effects[ode to booze]);
+	string consume = "consume all nomeat nightcap value " + get_property("valueOfAdventure") + " valuepvp " + to_int(voa);
 	cli_execute(to_upper_case(consume));
 }
 void nightcap() {
-	if (to_boolean(my_adventures()))
-		abort("Rethink overdrinking...");
+	if (my_adventures() > 0)
+		abort("still adventurous");
 	forcenightcap();
 }
 
 void prism() {
+	if (get_property("kingLiberated") != "true")
+		abort("now's not the time for that, RED!");
 	cli_execute("hagnk all; refresh all");
-	retrieve_item($item[blue plate]);
-	equip($item[blue plate], $familiar[shorter-order cook]);
-//	foreach f in $familiars[]
-//		if (have_familiar(f) && f.experience < 2 && f!=$familiar[crimbo shrub])
-//			use_familiar(f);
 	equip_all_familiars();
-	foreach it in $items[]
-		if (to_boolean(available_amount(it)) && string_modifier(it, "Skill") != "")
-			if (it.reusable && !have_skill(to_skill(string_modifier(it, "Skill"))))
-				use(it);
 	cli_execute("av-snapshot");
 }
 
 void ascend_cs() {
-	if (!to_boolean(to_int(get_property("ascensionsToday")))) {
-		funeral();
-		set_property("c2t_ascend", "2,1,1,25,2,5046,5040,2,0");
-		cli_execute("c2t_ascend");
-		if (!handling_choice())
-			visit_url("choice.php");
-		if (handling_choice())
-			run_choice(1);
-		cli_execute("backupcamera reverser enable");
-		string pvp = visit_url("peevpee.php?action=smashstone&pwd&confirm=on", true);
-		if(contains_text(pvp, "Pledge allegiance to"))
-			visit_url("peevpee.php?action=pledge&place=fight&pwd");
-	}
-
+	if (my_path().id == 0)
+		fresh_hell("2,1,1,25,2,5046,5040,2,0");
 	if (my_path().id == 25) {
 		cli_execute("lcswrapper");
 		if (get_property("kingLiberated") != "true")
 			abort("did not finish cs run");
 	}
-
 	string guildhall = visit_url("guild.php?place=challenge");
 	if (!contains_text(guildhall, "paco")) {
-		location chore = $location[The Outskirts of Cobb's Knob];
+		location chore = $location[The Outskirts of Cobb\'s Knob];
 		if (my_primestat() == $stat[mysticality])
 			chore = $location[The Haunted Pantry];
 		if (my_primestat() == $stat[moxie])
@@ -362,42 +337,59 @@ void ascend_cs() {
 	}
 	retrieve_item($item[skeletal skiff]);
 	prism();
-	coffee();
 }
 
 void ascend_yr() {
-	if (!to_boolean(to_int(get_property("ascensionsToday")))) {
-		funeral();
-		set_property("c2t_ascend", "2,3,1,41,3,5046,5040,2,0");
-		cli_execute("c2t_ascend");
-		birthday();
-	}
+	if (my_path().id == 0)
+		fresh_hell("2,3,1,41,3,5046,5040,2,0");
 	if (my_path().id == 41) {
-		cli_execute("looprobot");
-		if (to_boolean(item_amount($item[Thwaitgold listening bug statuette]))) {
-			visit_url("place.php?whichplace=scrapheap&action=sh_upgrade");
-			if (!handling_choice())
-				abort("ERROR, ERROR");
-			string response = "";
-			while (!(response.contains_text("You don't have enough Energy to do that.")))
-				response = run_choice(1);
-			run_choice(4);
-		}
-		visit_url("whichplace=nstower&action=ns_11_prism");
+		if (!to_boolean(item_amount($item[Thwaitgold listening bug statuette])))
+			cli_execute("looprobot");
+		if (!to_boolean(item_amount($item[Thwaitgold listening bug statuette])))
+			abort("beep boop, didn't doop");
+		string response = visit_url("place.php?whichplace=scrapheap&action=sh_upgrade");
+		if (!handling_choice())
+			abort("ERROR, ERROR");
+		while (response.contains_text("Good old Statbot.") && !(response.contains_text("You don't have enough Energy to do that.")))
+			response = run_choice(1);
+		run_choice(4);
+		visit_url("place.php?whichplace=nstower&action=ns_11_prism");
 	}
 	prism();
-	coffee();
-	resong($effects[ode to booze, celerity]);
-	foreach s in $skills[blood bubble, springy fusilli, silent hunter, inscrutable gaze]
+	resong($effects[Ode to Booze, Cletus's Canticle of Celerity]);
+	use($item[astral six-pack]);
+	drink(6, $item[astral pilsner]);
+	foreach s in $skills[blood bubble, springy fusilli, silent hunter, inscrutable gaze, tongue of the walrus, cannelloni cocoon]
 		use_skill(s);
 	use_familiar($familiar[left-hand man]);
 	maximize("muscle experience percent, moxie experience percent", false);
-	write_ccs(to_buffer("\"skill feel pride; use gas can, gas can; skill army of toddlers; abort;\""), "familyOkobolds");
+	set_auto_attack(0);
+	set_property("battleAction", "custom combat script");
+	write_ccs(to_buffer("\"if gotjump; skill feel pride; endif; use gas can, gas can; skill army of toddlers; abort;\""), "familyOkobolds");
 	set_ccs("familyOkobolds");
-	use($item[astral six-pack]);
-	drink(6, $item[astral pilsner]);
 	retrieve_item(100, $item[d4]);
 	use(100, $item[d4]);
+	cli_execute("3d_pandamonium 0");
+}
+
+void ascend_smol() {
+	if (my_path().id == 0)
+		fresh_hell("2,1,1,49,3,5046,5042,2,0");
+	if (my_path().id == 49) {
+		cli_execute("loopsmol");
+		if (!to_boolean(item_amount($item[Thwaitgold fairyfly statue])))
+			abort("one smol problem");
+		if (my_inebriety() == 1 && inebriety_limit() == 1) {
+			resong($effects[ode to booze]);
+			drink($item[astral pilsner]);
+		}
+		visit_url("place.php?whichplace=nstower&action=ns_11_prism");
+	}
+	use_skill(3, $skill[sweat out some booze]);
+	foreach it in $items[cuppa Sobrie tea, synthetic dog hair pill]
+		use(it);
+	prism();
+	cli_execute("3d_pandamonium 0");
 }
 
 void sleep() {
@@ -408,8 +400,9 @@ void sleep() {
 		use($item[packet of thanksgarden seeds]);
 	stash();
 	get_nude();
+	use_familiar($familiar[left-hand man]);
 	if (!to_boolean(have_effect($effect[Offhand Remarkable])))
 		cli_execute("genie effect Offhand Remarkable");
 	maximize("1.1 adv, fites", false);
-	cli_execute("ptrack add sleep; pTrack recap");
+	cli_execute("ptrack add sleep");
 }
