@@ -92,6 +92,11 @@ void resong(boolean[effect] gain) {
 		}
 }
 
+boolean no_junkmail(kmessage m) {
+	return ($strings[lady spookyraven's ghost, the loathing postal service, coolestrobot, fairygodmother, peace and love, torturebot, hermiebot, sellbot, botticelli, cat noir, onlyfax] contains to_lower_case(m.fromname));
+}	
+
+
 void fresh_hell(string c2t) {
 	if (to_boolean(to_int(get_property("ascensionsToday"))))
 		abort("one gash a night, buddy");
@@ -149,9 +154,6 @@ void pvp() {
 	if (to_boolean(pvp_attacks_left()))
 		cli_execute("pvp fame optimal dresser");
 
-	boolean no_junkmail(kmessage m) {
-		return ($strings[lady spookyraven's ghost, the loathing postal service, coolestrobot, fairygodmother, peace and love, torturebot, hermiebot, sellbot, botticelli, cat noir, onlyfax] contains to_lower_case(m.fromname));
-	}	
 	process_kmail("no_junkmail");
 }
 
